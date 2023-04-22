@@ -1,5 +1,10 @@
+#pragma once
+
 #include <bits/stdc++.h>
 using namespace std;
+
+template<typename T> class Matrix;
+template<typename T> ostream &operator<< (ostream &os, Matrix<T> &m);
 
 template<typename T>
 class Matrix {
@@ -43,7 +48,10 @@ class Matrix {
 	}
 
 
-	T determinant() const { return determinant_naive(); }
+	T determinant() const {
+		assert(n==m);
+		return determinant_gause_elimination();
+	}
 
 	Matrix identity() const {
 		assert(n==m);
@@ -54,10 +62,39 @@ class Matrix {
 	}
 
 	private:
+
+	T determinant_gause_elimination() const {
+		Matrix<T> mat(*this);
+
+		long double det = 1;
+		int sign = 1;
+
+		for (int piv = 0; piv < n; piv++) {
+			if (mat[piv][piv] == 0) {
+				for (int i = piv+1; i < n; i++) {
+					if (mat[i][piv] != 0) {
+						mat[piv].swap(mat[i]);
+						sign *= -1;
+						break ;
+					}
+				}
+				if (mat[piv][piv]==0) // then determinant is 0
+					return 0;
+			}
+			for (int i = piv+1; i < n; i++) {
+				if (mat[i][piv] == 0.) continue;
+				long double fact = mat[i][piv] / mat[piv][piv];
+				for (int j = 0; j < n; j++) {
+					mat[i][j] = mat[i][j] - fact * mat[piv][j];
+				}
+			}
+		}
+		for (int i = 0; i < n; i++)
+			det *= mat[i][i];
+		return det * sign;	
+	}
 	
 	T determinant_naive() const {
-		assert(n==m);
-		
 		if (n==1)
 			return matrix[0][0];
 		
@@ -81,6 +118,38 @@ class Matrix {
 	}
 
 };
+
+// gause elimination for integer type
+template<>
+int Matrix<int>::determinant_gause_elimination() const {
+	Matrix<int> mat(*this);
+	long long det = 1;
+	long long fact = 1;
+	for (int piv = 0; piv < n; piv++) {
+		if (!mat[piv][piv]) {
+			for (int i = piv+1; i < n; i++) {
+				if (mat[i][piv]) {
+					mat[piv].swap(mat[i]);
+					fact *= -1;
+					break ;
+				}
+			}
+			if (!mat[piv][piv])
+				return 0;
+		}
+		for (int i = piv+1; i < n; i++) {
+			if (!mat[i][piv]) continue;
+			int lc = lcm(abs(mat[i][piv]), abs(mat[piv][piv]));
+			int fact_i = lc / mat[i][piv], fact_piv = lc / mat[piv][piv];
+			for (int j = 0; j < n; j++)
+				mat[i][j] = mat[i][j] * fact_i - mat[piv][j] * fact_piv;
+			fact *= fact_i;
+		}
+	}
+	for (int i = 0; i < n; i++)
+		det *= mat[i][i];
+	return det /= fact, det;
+}
 
 template<typename T>
 ostream &operator<< (ostream &os, Matrix<T> &m) {
@@ -106,4 +175,4 @@ istream &operator>> (istream &is, Matrix<T> &m) {
 		}
 	}
 	return is;
-} 
+}

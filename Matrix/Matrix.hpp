@@ -110,7 +110,7 @@ class Matrix {
 						r++, c = 0;
 				}
 			}
-			det += matrix[0][k] * (k&1? -sub.determinant(): sub.determinant());
+			det += matrix[0][k] * (k&1? -sub.determinant_naive(): sub.determinant_naive());
 			r = 0, c = 0;
 		}
 

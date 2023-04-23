@@ -12,7 +12,7 @@ class Matrix {
 	vector<vector<T> > matrix;
 	
 	public:
-	Matrix(int n, int m, T def = 0): n(n), m(m), matrix(n, vector<T>(m, def)){}
+	Matrix(int n = 0, int m = 0, T def = 0): n(n), m(m), matrix(n, vector<T>(m, def)){}
 	Matrix(const Matrix<T> &cpy) { *this = cpy; }
 
 	int rows() const { return n; }
@@ -23,6 +23,16 @@ class Matrix {
 		this->n = cpy.n;
 		this->m = cpy.m;
 		this->matrix = cpy.matrix;
+		return *this;
+	}
+
+	template<typename X>
+	Matrix &operator=(Matrix<X> &b) {
+		if (n != b.rows() || m != b.cols())
+			n=b.rows(), m=b.cols(), matrix.resize(b.rows(), vector<T>(b.cols()));
+		for (int i = 0; i < n; i++)
+			for (int j = 0; j < m; j++)
+				matrix[i][j] = b[i][j];
 		return *this;
 	}
 
@@ -48,7 +58,7 @@ class Matrix {
 	}
 
 
-	T determinant() const {
+	T determinant() {
 		assert(n==m);
 		return determinant_gause_elimination();
 	}
@@ -63,24 +73,24 @@ class Matrix {
 
 	private:
 
-	T determinant_gause_elimination() const {
-		Matrix<T> mat(*this);
+	T determinant_gause_elimination() {
+		// converting to long double
+		Matrix<long double> mat;
+		mat = *this;
 
 		long double det = 1;
 		int sign = 1;
 
 		for (int piv = 0; piv < n; piv++) {
-			if (mat[piv][piv] == 0) {
-				for (int i = piv+1; i < n; i++) {
-					if (mat[i][piv] != 0) {
-						mat[piv].swap(mat[i]);
-						sign *= -1;
-						break ;
-					}
+			for (int i = piv+1; i < n; i++) { // partial pivoting
+				if (abs(mat[piv][piv]) < abs(mat[i][piv])) {
+					mat[piv].swap(mat[i]);
+					sign *= -1;
+					break ;
 				}
-				if (mat[piv][piv]==0) // then determinant is 0
-					return 0;
 			}
+			if (mat[piv][piv]==0) // then determinant is 0
+				return 0;
 			for (int i = piv+1; i < n; i++) {
 				if (mat[i][piv] == 0.) continue;
 				long double fact = mat[i][piv] / mat[piv][piv];
@@ -91,7 +101,7 @@ class Matrix {
 		}
 		for (int i = 0; i < n; i++)
 			det *= mat[i][i];
-		return det * sign;	
+		return det * sign;
 	}
 	
 	T determinant_naive() const {
@@ -121,8 +131,8 @@ class Matrix {
 
 // gause elimination for integer type
 template<>
-int Matrix<int>::determinant_gause_elimination() const {
-	Matrix<int> mat(*this);
+int Matrix<int>::determinant_gause_elimination() {
+	Matrix<long long> mat; mat = *this;
 	long long det = 1;
 	long long fact = 1;
 	for (int piv = 0; piv < n; piv++) {

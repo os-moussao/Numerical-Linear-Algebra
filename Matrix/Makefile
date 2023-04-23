@@ -1,10 +1,10 @@
 all: Matrix.bin
 
 %: %.cpp
-	g++ -std=c++17 $< -o $@
+	g++ -std=c++17 -Wall -Werror -Wextra $< -o $@
 
 %.bin: %.cpp
-	g++ -std=c++17 $< -o $@
+	g++ -std=c++17 -Wall -Werror -Wextra $< -o $@
 
 commit:
 	git commit -m "-"

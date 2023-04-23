@@ -1,4 +1,4 @@
-all:
+all: Matrix.bin
 
 %: %.cpp
 	g++ -std=c++17 $< -o $@
@@ -12,3 +12,5 @@ commit:
 
 clean:
 	rm -f *.out *.bin
+
+re: clean all

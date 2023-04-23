@@ -36,13 +36,14 @@ class Matrix {
 		return *this;
 	}
 
-	Matrix operator *(const Matrix<T> &right) const {
+	Matrix operator *(Matrix<T> &right) {
 		assert(cols() == right.rows());
 		Matrix<T> mult(rows(), right.cols());
 		for (int i = 0; i < mult.rows(); i++)
 			for (int j = 0; j < mult.cols(); j++)
 				for (int k = 0; k < cols(); k++)
 					mult[i][j] += matrix[i][k] * right[k][j];
+		return mult;
 	}
 
 	Matrix operator ^ (unsigned int exp) const {

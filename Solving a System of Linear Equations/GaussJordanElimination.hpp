@@ -4,11 +4,11 @@
 
 /**
  * Solving a system of linear equations, with $n equations and $n unknowns
- * using gause-jordan elimination algorithm with partial pivoting
+ * using gauss-jordan elimination algorithm with partial pivoting
  */
 
 template<typename U, typename V>
-Matrix<long double> GauseJordanElim(Matrix<U> &factors, Matrix<V> &rhs) {
+Matrix<long double> GaussJordanElim(Matrix<U> &factors, Matrix<V> &rhs) {
 	assert(factors.rows()==factors.cols() && factors.rows()==rhs.rows() && rhs.cols()==1);
 	
 	int n = factors.rows(), m = n+1;

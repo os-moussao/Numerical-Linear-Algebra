@@ -61,7 +61,7 @@ class Matrix {
 
 	T determinant() {
 		assert(n==m);
-		return determinant_gause_elimination();
+		return determinant_gauss_elimination();
 	}
 
 	Matrix identity() const {
@@ -82,7 +82,7 @@ class Matrix {
 
 	private:
 
-	T determinant_gause_elimination() {
+	T determinant_gauss_elimination() {
 		// converting to long double
 		Matrix<long double> mat;
 		mat = *this;
@@ -138,9 +138,9 @@ class Matrix {
 
 };
 
-// gause elimination for integer type
+// gauss elimination for integer type
 template<>
-int Matrix<int>::determinant_gause_elimination() {
+int Matrix<int>::determinant_gauss_elimination() {
 	Matrix<long long> mat; mat = *this;
 	long long det = 1;
 	long long fact = 1;

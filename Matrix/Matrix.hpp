@@ -36,7 +36,7 @@ class Matrix {
 		return *this;
 	}
 
-	Matrix operator *(Matrix<T> &right) {
+	Matrix operator *(Matrix<T> &right) const {
 		assert(cols() == right.rows());
 		Matrix<T> mult(rows(), right.cols());
 		for (int i = 0; i < mult.rows(); i++)
@@ -70,6 +70,14 @@ class Matrix {
 		for (int i = 0; i < n; i++)
 			id[i][i] = 1;
 		return id;
+	}
+
+	Matrix transpose() {
+		Matrix<T> mat(m, n);
+		for (int i = 0; i < n; i++)
+			for (int j = 0; j < m; j++)
+				mat[j][i] = matrix[i][j];
+		return mat;
 	}
 
 	private:

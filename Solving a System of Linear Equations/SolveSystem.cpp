@@ -1,4 +1,5 @@
 #include "GauseJordanElimination.hpp"
+#include "JacobiIteration.hpp"
 
 int main() {
 	int n; cin >> n;
@@ -9,12 +10,14 @@ int main() {
 		cin >> b[i][0];
 	}
 
-	Matrix<long double> solution = GauseJordanElim(a, b);
-	if (!solution.rows()) {
-		cout << "The system either has 0 or infinite solutions\n";
-		return 1;
-	}
-	cout << solution << endl;
+	Matrix<long double> gaussSolution = GauseJordanElim(a, b);
+	if (!gaussSolution.rows())
+		cout << "Gauss Jordan Elimination: The system either has 0 or infinite solutions\n";
+	else
+		cout << "Gauss Jordan Elinination:\n" << gaussSolution << endl;
+
+	Matrix<long double> jacobiSolution = Jacobi(a, b);
+	cout << "Jordan Iteration:\n" << jacobiSolution << endl;
 }
 
 /*

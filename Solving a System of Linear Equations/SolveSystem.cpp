@@ -1,5 +1,6 @@
 #include "GaussJordanElimination.hpp"
 #include "JacobiIteration.hpp"
+#include "GaussSeidelIteration.hpp"
 
 int main() {
 	int n; cin >> n;
@@ -18,6 +19,10 @@ int main() {
 
 	Matrix<long double> jacobiSolution = Jacobi(a, b);
 	cout << "Jordan Iteration:\n" << jacobiSolution << endl;
+
+	Matrix<long double> gaussSeidleSolution = GaussSeidel(a, b);
+	cout << "Gauss-Seidle Iteration:\n" << jacobiSolution << endl;
+
 }
 
 /*

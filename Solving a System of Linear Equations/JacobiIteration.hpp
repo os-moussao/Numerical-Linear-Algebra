@@ -13,7 +13,7 @@
 template<typename T>
 bool DiagonallyDominant(Matrix<T> &matrix) {
 	assert(matrix.rows()==matrix.cols());
-	bool ok = 1;
+	bool ok = 0;
 	for (int i = 0; i < matrix.rows(); i++) {
 		long double diff = abs(matrix[i][i]);
 		for (int j = 0; j < matrix.cols(); j++) if (j!=i)

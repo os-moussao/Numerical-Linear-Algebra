@@ -8,15 +8,24 @@ int main() {
 	cout << "a =\n" << a << endl << endl;
 	cout << "determinant of a = " << a.determinant() << endl << endl;
 
-	Matrix<double> b; b = a;
+	Matrix<long double> b; b = a;
 	cout << "b =\n" << b << endl << endl;
 	cout << "determinant of b = " << b.determinant() << endl;
 
-	Matrix<double> ib = b.inverse();
+	Matrix<long double> ib = b.inverse();
+	cout << "\nInverse of b =\n";
 	if (ib.rows()) {
-		Matrix<double> id1 = ib * b, id2 = b * ib;
-		cout << endl << ib << endl;
-		cout << id1 << endl;
-		cout << id2 << endl;
+		Matrix<long double> id = b.identity();
+		Matrix<long double> id1 = ib * b, id2 = b * ib;
+		
+		// assert solution is very close
+		for (int i = 0; i < n; i++) {
+			for (int j = 0; j < n; j++) {
+				assert((abs(id[i][j]-id1[i][j]) <= 1e-6) && (abs(id[i][j]-id2[i][j]) <= 1e-6));
+			}
+		}
+		cout << ib << endl;
+	} else {
+		cout << "b is a singular matrix !\n";
 	}
 }

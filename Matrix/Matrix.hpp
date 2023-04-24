@@ -80,6 +80,45 @@ class Matrix {
 		return mat;
 	}
 
+	Matrix inverse() {
+		assert(n==m);
+
+		Matrix<T> inverse = identity();
+		Matrix<T> mat(*this);
+
+		for (int piv = 0; piv < n; piv++) {
+			int optimal_pivot = piv;
+			for (int i = piv+1; i < n; i++) { // partial pivoting, for better precision
+				if (abs(mat[optimal_pivot][piv]) < abs(mat[i][piv])) {
+					optimal_pivot = i;
+				}
+			}
+			mat[piv].swap(mat[optimal_pivot]);
+			inverse[piv].swap(inverse[optimal_pivot]);
+
+
+			if (abs(mat[piv][piv]) < 1e-10) {
+				// then the matrix is singular
+				return Matrix<T>();
+			}
+			
+			if (mat[piv][piv] != 1) {
+				long double mat_piv_piv = mat[piv][piv];
+				for (int i = 0; i < m; i++)
+					mat[piv][i] /= mat_piv_piv, inverse[piv][i] /= mat_piv_piv;
+			}
+
+			for (int i = 0; i < n; i++) {
+				if (i == piv || mat[i][piv] == 0.) continue ;
+				long double fact = -mat[i][piv];
+				for (int j = 0; j < m; j++)
+					mat[i][j] += fact * mat[piv][j], inverse[i][j] += fact * inverse[piv][j];
+			}
+		}
+
+		return inverse;
+	}
+
 	private:
 
 	T determinant_gauss_elimination() {

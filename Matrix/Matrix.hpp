@@ -298,6 +298,13 @@ int Matrix<int>::determinant_gauss_elimination() {
 	return det /= fact, det;
 }
 
+Matrix<long double> identity(int n) {
+	Matrix<long double> id(n,n);
+	for (int i = 0; i < n; i++)
+		id[i][i] = 1;
+	return id;
+}
+
 
 // IO utils
 template<typename T>

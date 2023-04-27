@@ -6,13 +6,17 @@ using namespace std;
 template<typename T> class Matrix;
 template<typename T> ostream &operator<< (ostream &os, Matrix<T> &m);
 
+#define Vector Matrix
+
 template<typename T>
 class Matrix {
-	int n, m;
-	vector<vector<T> > matrix;
+	
+	protected:
+		int n, m;
+		vector<vector<T> > matrix;
 	
 	public:
-	Matrix(int n = 0, int m = 0, T def = 0): n(n), m(m), matrix(n, vector<T>(m, def)){}
+	Matrix(int n = 0, int m = 1, T def = 0): n(n), m(m), matrix(n, vector<T>(m, def)){}
 	Matrix(const Matrix<T> &cpy) { *this = cpy; }
 
 	int rows() const { return n; }
@@ -58,6 +62,32 @@ class Matrix {
 		return pr;
 	}
 
+	Matrix operator + (Matrix<T> &B) {
+		assert(n==B.rows() && m==B.cols());
+		Matrix<T> A(n, m);
+		for (int i = 0; i < n; i++)
+			for (int j = 0; j < m; j++)
+				A[i][j] = matrix[i][j] + B[i][j];
+		return A;
+	}
+
+	Matrix operator - (Matrix<T> &B) {
+		assert(n==B.rows() && m==B.cols());
+		Matrix<T> A(n, m);
+		for (int i = 0; i < n; i++)
+			for (int j = 0; j < m; j++)
+				A[i][j] = matrix[i][j] - B[i][j];
+		return A;
+	}
+
+	template<typename V>
+	friend Matrix<V> operator *(long double scalar, const Matrix<V> &A) {
+		Matrix<V> B(A);
+		for (int i = 0; i < B.rows(); i++)
+			for (int j = 0; j < B.cols(); j++)
+				B[i][j] *= scalar;
+		return B;
+	}
 
 	T determinant() {
 		assert(n==m);
@@ -117,6 +147,65 @@ class Matrix {
 		}
 
 		return inverse;
+	}
+
+	// Vector utils
+
+	private:
+		void __vec__() { assert(n && m==1); }
+
+	public:
+
+	int size() { return __vec__(), n; }
+
+	long double norm2() { // norm^2 to avoid precision lost by sqrtl
+		__vec__();
+		long double nrm2 = 0;
+		for (int i = 0; i < n; i++)
+			nrm2 += at(i)*at(i);
+		return nrm2;
+	}
+	
+	long double norm() {
+		return __vec__(), sqrtl(norm2());
+	}
+
+	Vector<long double> unity() {
+		__vec__();
+		Vector u; u = *this;
+		long double nrm = norm();
+		for (int i = 0; i < n; i++)
+			u.at(i) /= nrm;
+		return u;
+	}
+
+	T &at(unsigned int i) {
+		return __vec__(), assert(i < n), this->matrix[i][0];
+	}
+
+	Vector<T> col(unsigned int i) {
+		assert(i < m);
+		Vector<T> col_i(n);
+		for (int r = 0; r < n; r++)
+			col_i.at(r) = matrix[r][i];
+		return col_i;
+	}
+
+	template<typename U, typename V>
+	friend long double dot(Vector<U> &u, Vector<V> &v) {
+		assert(u.size()==v.size());
+		long double dotProd = 0;
+		for (int i = 0; i < v.size(); i++) {
+			dotProd += v.at(i) * u.at(i);
+		}
+		return dotProd;
+	}
+
+	template<typename U, typename V>
+	friend Vector<long double> Proj(Vector<U> &a, Vector<V> &v) {
+		assert(a.size()==v.size());
+		Vector<long double> u = v.unity();
+		return dot(a,u) * u;
 	}
 
 	private:
@@ -209,6 +298,8 @@ int Matrix<int>::determinant_gauss_elimination() {
 	return det /= fact, det;
 }
 
+
+// IO utils
 template<typename T>
 ostream &operator<< (ostream &os, Matrix<T> &m) {
 	os << '[';

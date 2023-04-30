@@ -1,5 +1,6 @@
 #include "Eigenvalues.hpp"
 #include "PowerMethod.hpp"
+#include "ShiftedInversePower.hpp"
 
 int main() {
 	int n; cin >> n;
@@ -7,25 +8,23 @@ int main() {
 	cin >> A;
 
 	vector<long double> eigvalues = eigenvalues(A);
-	sort(eigvalues.begin(), eigvalues.end(), [&] (auto &x, auto y) {
-		return abs(x) > abs(y);
-	});
 
-	for (long double x: eigvalues)
-		cout << x << '\n';
+	// eigenvalue, eigenvector pairs
+	vector<pair<long double, Vector<long double>>> eigen(n);
+	for (int i = 0; i < n; i++) {
+		// get the closest eigenvalue to eigvalues[i] and the corresponding eigenvector
+		eigen[i] = ShiftedInversePower(A, eigvalues[i]-0.01);
+	}
 
-	cout << "\nPower Method:" << endl;
+	for (auto &[lambda, v]: eigen) {
+		// assert A v = λ v
+		Vector<long double> Av(A * v);
+		for (int i = 0; i < n; i++)
+			assert(abs(Av.at(i) - lambda * v.at(i)) <= 1e-10);
 
-	auto[lam, firstEigenvector] = PowerMethod(A);
-
-	cout << "\neigenvalue with largest magnitude = " << lam << endl; // should be equal to eigvalues[0] 
-	cout << "\nx_0 =\n" << firstEigenvector << endl;
-
-	Vector<long double> a(A*firstEigenvector), b(eigvalues[0] * firstEigenvector);
-
-	// a,b should be equal
-	cout << "A x_0 =\n" << a << endl;
-	cout << "lam x_0 =\n" << b << endl;
+		cout << "eigenvalue = " << lambda << endl;
+		cout << "corresponding eigenvector =\n" << v << endl << endl;
+	}
 }
 /*
 example input:

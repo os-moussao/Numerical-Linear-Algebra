@@ -40,6 +40,18 @@ class Matrix {
 		return *this;
 	}
 
+	bool operator==(Matrix<T> &B) {
+		if (n != B.rows() || m != B.cols())
+			return false;
+		for (int i = 0; i < n; i++) {
+			for (int j = 0; j < m; j++) {
+				if (matrix[i][j] != B[i][j])
+					return false;
+			}
+		}
+		return true;
+	}
+
 	Matrix operator *(Matrix<T> &right) const {
 		assert(cols() == right.rows());
 		Matrix<T> mult(rows(), right.cols());

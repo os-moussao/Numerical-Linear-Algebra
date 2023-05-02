@@ -17,11 +17,15 @@ class Matrix {
 	
 	public:
 	Matrix(int n = 0, int m = 1, T def = 0): n(n), m(m), matrix(n, vector<T>(m, def)){}
-	Matrix(const Matrix<T> &cpy) { *this = cpy; }
+	template<typename V> Matrix(const Matrix<V> &cpy) { *this = cpy; }
 
 	int rows() const { return n; }
 	int cols() const { return m; }
 	vector<T> &operator [] (int i) { return matrix[i]; }
+	T elem(unsigned int i, unsigned int j = 0) const {
+		assert(i < (const unsigned int)n && j < (const unsigned int)m);
+		return matrix[i][j];
+	}
 
 	Matrix &operator = (const Matrix &cpy) {
 		this->n = cpy.n;
@@ -31,34 +35,34 @@ class Matrix {
 	}
 
 	template<typename X>
-	Matrix &operator=(Matrix<X> &b) {
+	Matrix &operator=(const Matrix<X> &b) {
 		if (n != b.rows() || m != b.cols())
 			n=b.rows(), m=b.cols(), matrix.resize(b.rows(), vector<T>(b.cols()));
 		for (int i = 0; i < n; i++)
 			for (int j = 0; j < m; j++)
-				matrix[i][j] = b[i][j];
+				matrix[i][j] = b.elem(i,j);
 		return *this;
 	}
 
-	bool operator==(Matrix<T> &B) {
+	bool operator==(const Matrix<T> &B) const {
 		if (n != B.rows() || m != B.cols())
 			return false;
 		for (int i = 0; i < n; i++) {
 			for (int j = 0; j < m; j++) {
-				if (matrix[i][j] != B[i][j])
+				if (matrix[i][j] != B.elem(i, j))
 					return false;
 			}
 		}
 		return true;
 	}
 
-	Matrix operator *(Matrix<T> &right) const {
+	Matrix operator *(const Matrix<T> &right) const {
 		assert(cols() == right.rows());
 		Matrix<T> mult(rows(), right.cols());
 		for (int i = 0; i < mult.rows(); i++)
 			for (int j = 0; j < mult.cols(); j++)
 				for (int k = 0; k < cols(); k++)
-					mult[i][j] += matrix[i][k] * right[k][j];
+					mult[i][j] += matrix[i][k] * right.elem(k, j);
 		return mult;
 	}
 
@@ -74,21 +78,21 @@ class Matrix {
 		return pr;
 	}
 
-	Matrix operator + (Matrix<T> &B) {
+	Matrix operator + (const Matrix<T> &B) const {
 		assert(n==B.rows() && m==B.cols());
 		Matrix<T> A(n, m);
 		for (int i = 0; i < n; i++)
 			for (int j = 0; j < m; j++)
-				A[i][j] = matrix[i][j] + B[i][j];
+				A[i][j] = matrix[i][j] + B.elem(i, j);
 		return A;
 	}
 
-	Matrix operator - (Matrix<T> &B) {
+	Matrix operator - (const Matrix<T> &B) const {
 		assert(n==B.rows() && m==B.cols());
 		Matrix<T> A(n, m);
 		for (int i = 0; i < n; i++)
 			for (int j = 0; j < m; j++)
-				A[i][j] = matrix[i][j] - B[i][j];
+				A[i][j] = matrix[i][j] - B.elem(i,j);
 		return A;
 	}
 
@@ -101,7 +105,7 @@ class Matrix {
 		return B;
 	}
 
-	T determinant() {
+	T determinant() const {
 		assert(n==m);
 		return determinant_gauss_elimination();
 	}
@@ -114,7 +118,7 @@ class Matrix {
 		return id;
 	}
 
-	Matrix transpose() {
+	Matrix transpose() const {
 		Matrix<T> mat(m, n);
 		for (int i = 0; i < n; i++)
 			for (int j = 0; j < m; j++)
@@ -164,27 +168,23 @@ class Matrix {
 	// Vector utils
 
 	private:
-		void __vec__() { assert(n && m==1); }
+		void __vec__() const { assert(n && m==1); }
 
 	public:
 
-	int size() { return __vec__(), n; }
+	int size() const { return __vec__(), n; }
 
-	long double norm2() { // norm^2 to avoid precision lost by sqrtl
-		__vec__();
-		long double nrm2 = 0;
-		for (int i = 0; i < n; i++)
-			nrm2 += at(i)*at(i);
-		return nrm2;
+	long double norm2() const { // norm^2 to avoid precision lost by sqrtl
+		return __vec__(), dot(*this, *this);
 	}
 	
-	long double norm() {
+	long double norm() const {
 		return __vec__(), sqrtl(norm2());
 	}
 
-	Vector<long double> unity() {
+	Vector<long double> unity() const {
 		__vec__();
-		Vector u; u = *this;
+		Vector<long double> u; u = *this;
 		long double nrm = norm();
 		for (int i = 0; i < n; i++)
 			u.at(i) /= nrm;
@@ -195,7 +195,7 @@ class Matrix {
 		return __vec__(), assert(i < n), this->matrix[i][0];
 	}
 
-	Vector<T> col(unsigned int i) {
+	Vector<T> col(unsigned int i) const {
 		assert(i < m);
 		Vector<T> col_i(n);
 		for (int r = 0; r < n; r++)
@@ -204,17 +204,17 @@ class Matrix {
 	}
 
 	template<typename U, typename V>
-	friend long double dot(Vector<U> &u, Vector<V> &v) {
+	friend long double dot(const Vector<U> &u, const Vector<V> &v) {
 		assert(u.size()==v.size());
 		long double dotProd = 0;
 		for (int i = 0; i < v.size(); i++) {
-			dotProd += v.at(i) * u.at(i);
+			dotProd += v.elem(i) * u.elem(i);
 		}
 		return dotProd;
 	}
 
 	template<typename U, typename V>
-	friend Vector<long double> Proj(Vector<U> &a, Vector<V> &v) {
+	friend Vector<long double> Proj(const Vector<U> &a, const Vector<V> &v) {
 		assert(a.size()==v.size());
 		Vector<long double> u = v.unity();
 		return dot(a,u) * u;
@@ -222,7 +222,7 @@ class Matrix {
 
 	private:
 
-	T determinant_gauss_elimination() {
+	T determinant_gauss_elimination() const {
 		// converting to long double
 		Matrix<long double> mat;
 		mat = *this;
@@ -280,8 +280,8 @@ class Matrix {
 
 // gauss elimination for integer type
 template<>
-int Matrix<int>::determinant_gauss_elimination() {
-	Matrix<long long> mat; mat = *this;
+int Matrix<int>::determinant_gauss_elimination() const {
+	Matrix<int> mat(*this);
 	long long det = 1;
 	long long fact = 1;
 	for (int piv = 0; piv < n; piv++) {
@@ -320,19 +320,24 @@ Matrix<long double> identity(int n) {
 
 // IO utils
 template<typename T>
-ostream &operator<< (ostream &os, Matrix<T> &m) {
+ostream &operator<< (ostream &os, const Matrix<T> &m) {
 	os << '[';
 	for (int i = 0; i < m.rows(); i++) {
 		if (i) os << " ";
 		os << '[';
 		for (int j = 0; j < m.cols(); j++) {
 			if (j) os << ", ";
-			os << m[i][j];
+			os << m.elem(i, j);
 		}
 		os << ']';
 		if (i < m.rows()-1) os << ",\n";
 	}
 	return os << ']';
+}
+
+template<typename T>
+ostream &operator<< (ostream &os, Matrix<T> &m) {
+	return os << (const Matrix<T> &)m;
 }
 
 template<typename T>

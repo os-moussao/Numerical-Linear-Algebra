@@ -8,7 +8,7 @@ int main() {
 	cout << "a =\n" << a << endl << endl;
 	cout << "determinant of a = " << a.determinant() << endl << endl;
 
-	Matrix<long double> b; b = a;
+	Matrix<long double> b(a);
 	cout << "b =\n" << b << endl << endl;
 	cout << "determinant of b = " << b.determinant() << endl;
 
@@ -28,4 +28,13 @@ int main() {
 	} else {
 		cout << "b is a singular matrix !\n";
 	}
+
+	// just messing around with operators
+	Matrix<int> aT(a.transpose());
+	assert((a*a*a*a*a*aT*aT == (a^5)*(aT^2)));
+	assert((((5*a) + (2*aT)) == (a+a+a+a+a+aT+aT)));
+	assert(((a-2*a)==(-1*a)));
+	assert((a*aT*a*aT == ((a*aT)^2)));
+	assert((a.col(0).transpose() * a.col(0)).at(0) == a.col(0).norm2());
+	assert((Proj(a.col(1), a.col(1)) == b.col(1)));
 }

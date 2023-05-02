@@ -1,29 +1,27 @@
 #include "Eigenvalues.hpp"
 #include "PowerMethod.hpp"
 #include "ShiftedInversePower.hpp"
+#include "Eigen.hpp"
 
 int main() {
 	int n; cin >> n;
 	Matrix<long double> A(n,n);
 	cin >> A;
 
-	vector<long double> eigvalues = eigenvalues(A);
+	auto [eigenvalues, eigenvectors] = Eigen(A);
 
-	// eigenvalue, eigenvector pairs
-	vector<pair<long double, Vector<long double>>> eigen(n);
 	for (int i = 0; i < n; i++) {
-		// get the closest eigenvalue to eigvalues[i] and the corresponding eigenvector
-		eigen[i] = ShiftedInversePower(A, eigvalues[i]-0.01);
-	}
+		long double lam = eigenvalues[i];
+		Vector<long double> v = eigenvectors.col(i);
 
-	for (auto &[lambda, v]: eigen) {
 		// assert A v = λ v
-		Vector<long double> Av(A * v);
-		for (int i = 0; i < n; i++)
-			assert(abs(Av.at(i) - lambda * v.at(i)) <= 1e-10);
-
-		cout << "eigenvalue = " << lambda << endl;
+		Vector<long double> check(A*v - lam*v);
+		for (int j = 0; j < n; j++)
+			assert(abs(check.at(j)) <= 1e-10);
+		
+		cout << "eigenvalue = " << lam << endl;
 		cout << "corresponding eigenvector =\n" << v << endl << endl;
+
 	}
 }
 /*

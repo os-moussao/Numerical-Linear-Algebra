@@ -10,7 +10,7 @@
 
 // A = [x1, x2, ... xn]
 template<typename T>
-pair<Matrix<long double>, Matrix<long double>> GramSchmidtQR(Matrix <T> &A) { // QR decomposition using Gram-Schmidt process
+pair<Matrix<long double>, Matrix<long double>> GramSchmidtQR(const Matrix <T> &A) { // QR decomposition using Gram-Schmidt process
 	assert(A.rows() && A.rows()==A.cols());
 
 	int n = A.rows();

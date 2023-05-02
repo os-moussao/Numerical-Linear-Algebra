@@ -22,7 +22,7 @@
  */
 
 template<typename T>
-pair<long double, Vector<long double>> PowerMethod(Matrix<T> &A) {
+pair<long double, Vector<long double>> PowerMethod(const Matrix<T> &A) {
 	assert(A.rows() && A.rows()==A.cols());
 
 	int n = A.rows();

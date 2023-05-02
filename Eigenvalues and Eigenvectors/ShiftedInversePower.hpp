@@ -20,7 +20,7 @@
  */
 
 template<typename T>
-pair<long double, Vector<long double>> ShiftedInversePower(Matrix<T> &A, long double alpha) {
+pair<long double, Vector<long double>> ShiftedInversePower(const Matrix<T> &A, long double alpha) {
 	assert(A.rows() && A.rows()==A.cols());
 
 	// creating B = inverse(A - alpha I)

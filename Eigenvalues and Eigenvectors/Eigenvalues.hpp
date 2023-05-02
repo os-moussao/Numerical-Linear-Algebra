@@ -26,16 +26,15 @@ bool isUpperTriangular(Matrix<T> &A, int n, long double tolerance) {
 }
 
 template<typename T>
-vector<long double> eigenvalues(Matrix<T> &A, long double tolerance=EPS) {
+vector<long double> eigenvalues(const Matrix<T> &A, long double tolerance=EPS) {
 	assert(A.rows() && A.rows()==A.cols());
 
 	int n = A.rows();
 
 	int max_iterations = 10000;
 
-	Matrix<long double> A_k(n,n);
+	Matrix<long double> A_k = A;
 
-	A_k = A;
 	for (int k = 1; k < max_iterations && !isUpperTriangular(A_k,n,tolerance); k++) {
 		auto [Q, R] = QR_HouseHolder(A_k); // A_k = Q_k R_k
 		A_k = R * Q; // A_k+1 = R_k * Q_k // A_k <- A_k+1

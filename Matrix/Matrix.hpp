@@ -96,14 +96,6 @@ class Matrix {
 		return A;
 	}
 
-	template<typename V>
-	friend Matrix<V> operator *(long double scalar, const Matrix<V> &A) {
-		Matrix<V> B(A);
-		for (int i = 0; i < B.rows(); i++)
-			for (int j = 0; j < B.cols(); j++)
-				B[i][j] *= scalar;
-		return B;
-	}
 
 	T determinant() const {
 		assert(n==m);
@@ -203,22 +195,6 @@ class Matrix {
 		return col_i;
 	}
 
-	template<typename U, typename V>
-	friend long double dot(const Vector<U> &u, const Vector<V> &v) {
-		assert(u.size()==v.size());
-		long double dotProd = 0;
-		for (int i = 0; i < v.size(); i++) {
-			dotProd += v.elem(i) * u.elem(i);
-		}
-		return dotProd;
-	}
-
-	template<typename U, typename V>
-	friend Vector<long double> Proj(const Vector<U> &a, const Vector<V> &v) {
-		assert(a.size()==v.size());
-		Vector<long double> u = v.unity();
-		return dot(a,u) * u;
-	}
 
 	private:
 
@@ -278,6 +254,7 @@ class Matrix {
 
 };
 
+
 // gauss elimination for integer type
 template<>
 int Matrix<int>::determinant_gauss_elimination() const {
@@ -310,6 +287,7 @@ int Matrix<int>::determinant_gauss_elimination() const {
 	return det /= fact, det;
 }
 
+// friend functions
 Matrix<long double> identity(int n) {
 	Matrix<long double> id(n,n);
 	for (int i = 0; i < n; i++)
@@ -317,6 +295,31 @@ Matrix<long double> identity(int n) {
 	return id;
 }
 
+template<typename V>
+Matrix<V> operator *(long double scalar, const Matrix<V> &A) {
+	Matrix<V> B(A);
+	for (int i = 0; i < B.rows(); i++)
+		for (int j = 0; j < B.cols(); j++)
+			B[i][j] *= scalar;
+	return B;
+}
+
+template<typename U, typename V>
+long double dot(const Vector<U> &u, const Vector<V> &v) {
+	assert(u.size()==v.size());
+	long double dotProd = 0;
+	for (int i = 0; i < v.size(); i++) {
+		dotProd += v.elem(i) * u.elem(i);
+	}
+	return dotProd;
+}
+
+template<typename U, typename V>
+Vector<long double> Proj(const Vector<U> &a, const Vector<V> &v) {
+	assert(a.size()==v.size());
+	Vector<long double> u = v.unity();
+	return dot(a,u) * u;
+}
 
 // IO utils
 template<typename T>
